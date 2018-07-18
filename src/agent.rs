@@ -8,7 +8,7 @@ use transport_mode::TransportMode;
 use journey_type::JourneyType;
 use neighbourhood::Neighbourhood;
 use subculture::Subculture;
-use union_with::union_of;
+use hashmap_union::union_of;
 
 /// The agent in the model
 #[derive(PartialEq)]

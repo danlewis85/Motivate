@@ -4,13 +4,12 @@ extern crate itertools;
 #[macro_use] extern crate serde_derive;
 extern crate simple_logger;
 extern crate serde_yaml;
-extern crate im;
 extern crate rand;
 extern crate rayon;
+extern crate hashmap_union;
 
 mod weather;
 mod transport_mode;
-mod season;
 mod journey_type;
 mod neighbourhood;
 mod subculture;
@@ -18,7 +17,6 @@ mod scenario;
 mod agent;
 mod simulation;
 mod intervention;
-mod union_with;
 mod social_network;
 mod statistics;
 mod gaussian;
@@ -31,7 +29,6 @@ use std::io::Write;
 use std::io::prelude::*;
 use rayon::prelude::*;
 use weather::Weather;
-use season::season;
 
 /// This is the entry point for the application
 fn main() {
@@ -63,18 +60,20 @@ fn main() {
         }
     }
 
-    // Create a random weather pattern drawing from the percentage_bad_weather of each season
-    let mut weather_pattern: HashMap<u32, Weather> = HashMap::new();
-
-    for i in 0..(parameters.total_years * 365) {
-        let current_season = season(i);
-        let random_float = rand::random::<f32>();
-        if random_float > current_season.percentage_bad_weather() {
-            weather_pattern.insert(i, Weather::Good);
-        } else {
-            weather_pattern.insert(i, Weather::Bad);
+    let weather_transition_matrix: HashMap<Weather, HashMap<Weather, f64>> = hashmap! {
+        Weather::Good => hashmap! {
+            Weather::Good => 0.886,
+            Weather::Bad => 0.114
+        },
+        Weather::Bad => hashmap! {
+            Weather::Good => 0.699,
+            Weather::Bad => 0.301
         }
-    }
+    };
+
+    let weather_pattern = Weather::make_pattern(
+        weather_transition_matrix, 0.14, (365 * parameters.total_years) as usize);
+
 
     // Run in parallel the simulations
     (1..=parameters.number_of_simulations)

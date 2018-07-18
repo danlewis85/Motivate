@@ -1,5 +1,29 @@
-// This is based of code from https://athemathmo.github.io/2016/06/24/using-gmm-in-rust.html
-// TODO: Currently waiting on confirmation of license.
+// This is derivative work of https://athemathmo.github.io/2016/06/24/using-gmm-in-rust.html
+// See - https://github.com/AtheMathmo/AtheMathmo.github.io/issues/2 for proof of license
+//
+//
+// The MIT License (MIT) - for the original work
+//
+// Copyright (c) 2016 James Lucas
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights 
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+// copies of the Software, and to permit persons to whom the Software is furnished
+// to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all 
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+// SOFTWARE.
+
 
 use rand::distributions::{Normal, Distribution};
 use rand::Rng;

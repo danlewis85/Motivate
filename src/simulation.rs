@@ -23,7 +23,7 @@ use subculture::Subculture;
 use scenario::Scenario;
 use agent::Agent;
 use statistics;
-use union_with::union_of;
+use hashmap_union::union_of;
 use social_network;
 use std::cmp;
 use gaussian;
@@ -49,7 +49,7 @@ pub fn run(id: String,
            number_of_neighbour_links: u32,
            days_in_habit_average: u32,
            distributions: Vec<(f64, f64, f64)>,
-           weather_pattern: &HashMap<u32, Weather>,
+           weather_pattern: &Vec<Weather>,
            network: HashMap<u32, Vec<u32>>) -> Result<(), io::Error> 
 {
     // Used for monitoring running time
@@ -83,7 +83,7 @@ pub fn run(id: String,
     file.write(generate_csv_header(&scenario).as_bytes())?;
 
     // Get the weather at day 0
-    let mut weather = weather_pattern.get(&0).unwrap();
+    let mut weather = weather_pattern[0];
 
     // Write the first set of statistics to the file
     file.write(generate_csv_output(0, &weather, &scenario, &residents).as_bytes())?;
@@ -101,7 +101,7 @@ pub fn run(id: String,
             info!("[{}] Day: {}", id, day);
 
             // Get the new weather
-            let new_weather = weather_pattern.get(&day).unwrap();
+            let new_weather = weather_pattern[day as usize];
 
             // For each resident update the habit
             for resident in residents.iter_mut() {
@@ -110,7 +110,7 @@ pub fn run(id: String,
 
             // For each resident, choose a travel mode
             for resident in residents.iter_mut() {
-                resident.borrow_mut().choose(new_weather, weather != new_weather);
+                resident.borrow_mut().choose(&new_weather, weather != new_weather);
             }
 
             // Update the weather
