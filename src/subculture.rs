@@ -13,6 +13,15 @@ pub struct Subculture {
     pub desirability: RefCell<HashMap<TransportMode, f32>>
 }
 
+impl Default for Subculture {
+    fn default() -> Self {
+        Subculture {
+            id: "Placeholder".to_string(),
+            desirability: RefCell::new(HashMap::new())
+        }
+    }
+}
+
 impl PartialEq for Subculture {
     /// Returns true if the subcultures have the same ID
     fn eq(&self, other: &Subculture) -> bool {

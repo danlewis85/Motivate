@@ -4,4 +4,5 @@
 *.iml
 output/
 config/networks/
+config/agents/
 .vscode/

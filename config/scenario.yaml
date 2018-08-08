@@ -1,5 +1,5 @@
 ---
-id: post intervention
+id: intervention B
 subcultures:
   - id: Subculture A
     desirability:
@@ -20,35 +20,237 @@ subcultures:
       Walk: 0.8999999761581421
       PublicTransport: 0.5
 neighbourhoods:
-  - id: "0"
-    supportiveness:
-      Cycle: 0.699999988079071
-      Walk: 0.800000011920929
-      Car: 0.8999999761581421
-      PublicTransport: 0.8999999761581421
   - id: "1"
     supportiveness:
-      Cycle: 0.699999988079071
-      Walk: 0.800000011920929
-      Car: 0.5
-      PublicTransport: 1.0
+      PublicTransport: 0.146
+      Cycle: 0.697
+      Car: 0.002
+      Walk: 0.318
+    capacity:
+      Car: 3725
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 5548
   - id: "2"
     supportiveness:
-      Walk: 0.6000000238418579
-      PublicTransport: 0.5
-      Cycle: 0.800000011920929
-      Car: 0.699999988079071
+      PublicTransport: 0.493
+      Cycle: 0.438
+      Car: 0.740
+      Walk: 0.219
+    capacity:
+      Car: 2084
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 87
   - id: "3"
     supportiveness:
-      PublicTransport: 0.8999999761581421
-      Cycle: 0.8999999761581421
-      Car: 0.20000000298023225
-      Walk: 0.8999999761581421
-number_of_bikes: 10000
-number_of_cars: 5000
+      PublicTransport: 0.681
+      Cycle: 0.377
+      Car: 0.315
+      Walk: 0.937
+    capacity:
+      Car: 6605
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 6856
+  - id: "4"
+    supportiveness:
+      PublicTransport: 0.597
+      Cycle: 0.843
+      Car: 0.648
+      Walk: 0.127
+    capacity:
+      Car: 2375
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 5166
+  - id: "5"
+    supportiveness:
+      PublicTransport: 0.258
+      Cycle: 0.269
+      Car: 0.464
+      Walk: 0.419
+    capacity:
+      Car: 1079
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 1474
+  - id: "6"
+    supportiveness:
+      PublicTransport: 0.742
+      Cycle: 0.902
+      Car: 0.381
+      Walk: 0.600
+    capacity:
+      Car: 1095 
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 2078
+  - id: "7"
+    supportiveness:
+      PublicTransport: 0.262
+      Cycle: 0.185
+      Car: 0.459
+      Walk: 0.550
+    capacity:
+      Car: 2460
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 5765
+  - id: "8"
+    supportiveness:
+      PublicTransport: 0.211
+      Cycle: 0.047
+      Car: 0.032
+      Walk: 0.497
+    capacity:
+      Car: 1897
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 3502
+  - id: "9"
+    supportiveness:
+      PublicTransport: 0.397
+      Cycle: 0.374
+      Car: 0.339
+      Walk: 0.340
+    capacity:
+      Car: 5703
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 458
+  - id: "10"
+    supportiveness:
+      PublicTransport: 0.877
+      Cycle: 0.834
+      Car: 0.418
+      Walk: 0.963
+    capacity:
+      Car: 2503
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 7467
+  - id: "11"
+    supportiveness:
+      PublicTransport: 0.188
+      Cycle: 0.956
+      Car: 0.304
+      Walk: 0.622
+    capacity:
+      Car: 4848 
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 2810
+  - id: "12"
+    supportiveness:
+      PublicTransport: 0.057
+      Cycle: 0.186
+      Car: 0.598
+      Walk: 0.501
+    capacity:
+      Car: 3700
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 3065
+  - id: "13"
+    supportiveness:
+      PublicTransport: 0.660
+      Cycle: 0.037
+      Car: 0.919
+      Walk: 0.107
+    capacity:
+      Car: 1229
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 5054
+  - id: "14"
+    supportiveness: 
+      PublicTransport: 0.128
+      Cycle: 0.266
+      Car: 0.847
+      Walk: 0.140
+    capacity:
+      Car: 6110
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 181
+  - id: "15"
+    supportiveness:
+      PublicTransport: 0.763
+      Cycle: 0.215
+      Car: 0.240
+      Walk: 0.809
+    capacity:
+      Car: 6890
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 3565
+  - id: "16"
+    supportiveness:
+      PublicTransport: 0.003
+      Cycle: 0.931
+      Car: 0.790
+      Walk: 0.143
+    capacity:
+      Car: 709
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 4880
+  - id: "17"
+    supportiveness:
+      PublicTransport: 0.272
+      Cycle: 0.717
+      Car: 0.328
+      Walk: 0.416
+    capacity:
+      Car: 1828
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 5221
+  - id: "18"
+    supportiveness:
+      PublicTransport: 0.463
+      Cycle: 0.081
+      Car: 0.881
+      Walk: 0.232
+    capacity:
+      Car: 3203
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 6907
+  - id: "19"
+    supportiveness:
+      PublicTransport: 0.180
+      Cycle: 0.908
+      Car: 0.964
+      Walk: 0.169
+    capacity:
+      Car: 4050
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 3957
+  - id: "20"
+    supportiveness:
+      PublicTransport: 0.801
+      Cycle: 0.887
+      Car: 0.693
+      Walk: 0.017
+    capacity:
+      Car: 6243
+      Cycle: 150000
+      Walk: 150000
+      PublicTransport: 3026
+number_of_bikes: 50000
+number_of_cars: 25000
 intervention:
-  day: 365
-  neighbourhood_changes: []
+  day: 912
+  neighbourhood_changes: 
+    - id: "9"
+      increase_in_capacity:
+        Car: -5000
+    - id: "4"
+      increase_in_capacity:
+        Car: -1000
   subculture_changes: []
-  change_in_number_of_bikes: 10000
-  change_in_number_of_cars: -100
+  change_in_number_of_bikes: 0
+  change_in_number_of_cars: 0

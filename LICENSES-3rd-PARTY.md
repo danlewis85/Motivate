@@ -37,6 +37,7 @@
 * winapi-i686-pc-windows-gnu - Copyright (c) 2015-2018 The winapi-rs Developers
 * unicode-xid - Copyright (c) 2015 The Rust Project Developers
 * yaml-rust - Copyright (c) 2015 Chen Yuheng
+* rusty-machine - Copyright (c) 2016 James Lucas
 
 MIT License
 

@@ -1,0 +1,15 @@
+language: rust
+rust:
+- stable
+os: osx
+script:
+- cargo build --verbose --release
+- zip -r mac.zip target/release
+deploy:
+  provider: releases
+  api_key:
+    secure: 2J2nRGUdG9GjDpVxnVhYJFSKiH+TwcpBASTWZoZWqB8TX5OVq/4bEemRMoQ+uhf/gtioBCyf5zHxNhtj7qgrPl+Iu/xsfJOBiPCt/xY27Lt/vhKRSFehlzHh/elozUZKSjdAHMzdvEysFwlPdNvgOWe+x+xXrPfwuU8Mpy1zPQ1xETvQXBaq8nsRxJWLImXmSBRT3cNbyp2Eb4pPEgiP5EbatoZMskuiHtLU21T0t48nbLFND+mXtBtWAhy7Vb9YTX9lhAVRXLyjAfHzb+xWw9H1Yj1HyHeyk62E3U206fOy+q2b2kQ9WEhQHW9/HSaWM6+EGOpRGlsi/12r5jARY/lB6LZotZI2GETDiZQCf1Rq4PJuQfCMzjD8bnHzQmRR4cHhWh3KBNOvBG9HWTwrbUIyoo3+x2m3tYZe58YRSvuydpwuvILF4kyil8dBrpESEGj8xEIpjnS6lhY36tib3aIjHr4aCMuOr9La51M+hj/RJ5jRSHdplciu6Japjz/ORnv6sBrFSr9kSi+5WSGGdOhUH+vzaqtPDO/jOUthYUWRsqLqqu1tCe8SVUimukulBA3/k5ZbOz2PziBNXiZMWF/2S5j9lCr5QfeUxkhgSWe+JsR+a8KWsl3jAbiHRI3rNJCP0QV4KYznkAYUE7LcTW6jSOCG5HA3rwj0qfXTnho=
+  file: mac.zip
+  on:
+    repo: ragreener1/Motivate
+    tags: true

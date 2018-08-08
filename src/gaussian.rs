@@ -49,7 +49,8 @@ pub fn get_samples_from_gmm(
         .iter()
         .map(|(_, _, weight)| *weight)
         .collect();
-    
+
+    // Create a random number generator    
     let mut rng = thread_rng();
 
     // Create a vec for the samples
@@ -80,6 +81,7 @@ fn pick_distribution_id<R: Rng>(weights: &[f64], rng: &mut R) -> usize {
     // Generate a number between 0 and total_weight
     let random_number = rng.gen_range(0.0f64, total_weight);
 
+    // Initialise culmulative distribtuion function at 0
     let mut cdf = 0.0f64;
     // For each weight
     for (i, weight) in weights.iter().enumerate() {

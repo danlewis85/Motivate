@@ -26,10 +26,17 @@ pub struct NeighbourhoodChange {
     /// Neighbourhood ID
     pub id: String,
 
-    /// Be very careful that this does not make the supportiveness > 1 or < 0
+    /// Be very careful that this does not make the supportiveness > 1 or < 0  
     /// This represents an increase in supportiveness of v for TransportMode k, 
     /// where (k, v) are elements of the HashMap
-    pub increase_in_supportiveness: HashMap<TransportMode, f32>
+    #[serde(default)]
+    pub increase_in_supportiveness: HashMap<TransportMode, f32>,
+
+    /// Be very careful that this does not make capacity > the max size of u32, or < 0  
+    /// This represents an increase in capacity of v for TransportMode k,
+    /// where (k, v) are elements of the HashMap
+    #[serde(default)]
+    pub increase_in_capacity: HashMap<TransportMode, i64>
 }
 
 /// This defines changes to a subculture that may form part of an intervention

@@ -20,6 +20,8 @@ mod intervention;
 mod social_network;
 mod statistics;
 mod gaussian;
+mod debug;
+mod agent_generation;
 
 use std::fs::File;
 use std::collections::HashMap;
@@ -50,17 +52,25 @@ fn main() {
     // Get the system arguments
     let args: Vec<String> = env::args().collect();
 
+    let mut generate = false;
+
     // If the generate flag is used
     if args.len() >= 2 {
         if &args[1] == "--generate" {
             generate_and_save_networks(
                 parameters.number_of_simulations, 
                 parameters.number_of_social_network_links, 
-                parameters.number_of_people)
+                parameters.number_of_people);
+            
+            // Create a agents directory to store them in
+             std::fs::create_dir_all("config/agents")
+                .expect("Failed to create config/agents directory");
+
+            generate = true;
         }
     }
 
-    let weather_transition_matrix: HashMap<Weather, HashMap<Weather, f64>> = hashmap! {
+    let weather_transition_matrix = hashmap! {
         Weather::Good => hashmap! {
             Weather::Good => 0.886,
             Weather::Bad => 0.114
@@ -81,14 +91,22 @@ fn main() {
         .par_iter()
         .for_each(|id| {
             // Get the network number and load the network
-            let network_number: String = id.to_string();
-            let file = File::open(format!("config/networks/{}.yaml", network_number))
+            let network_number = id.to_string();
+            let network_file = File::open(format!("config/networks/{}.yaml", network_number))
                 .expect("File cannot be opened");
 
-            let network = read_network(file);
+            let network = read_network(network_file);
+
+            let agent_file = if generate {
+                File::create(format!("config/agents/{}.yaml", network_number)).expect("File cannot be created")
+            } else {
+                File::open(format!("config/agents/{}.yaml", network_number)).expect("File cannot be opened")
+            };
 
             simulation::run(id.to_string(),
-                        std::fs::File::open("config/scenario.yaml").ok().unwrap(),
+                        generate,
+                        agent_file,
+                        File::open("config/scenario.yaml").ok().unwrap(),
                         parameters.total_years,
                         parameters.number_of_people,
                         parameters.social_connectivity,
@@ -198,7 +216,6 @@ impl Parameters {
     /// * file: The YAML file storing the serialized parameters
     /// * Returns; The created parameters
     pub fn from_file(mut file: File) -> Self {
-        ;
         info!("Loading parameters from file");
         let mut file_contents = String::new();
 

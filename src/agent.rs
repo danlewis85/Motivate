@@ -3,21 +3,30 @@ use itertools::Itertools;
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::cmp;
+use std::cmp::Ordering;
 use weather::Weather;
 use transport_mode::TransportMode;
 use journey_type::JourneyType;
 use neighbourhood::Neighbourhood;
 use subculture::Subculture;
-use hashmap_union::union_of;
+use hashmap_union::{union_of, intersection_of};
 
 /// The agent in the model
-#[derive(PartialEq)]
+#[derive(PartialEq, Serialize, Deserialize)]
 pub struct Agent {
     /// The demographic agent of the subculture
+    #[serde(skip)]
     pub subculture: Rc<Subculture>,
 
+    /// The ID of the subculture
+    pub subculture_id: String,
+
     /// The neighbourhood the agent lives in
+    #[serde(skip)]
     pub neighbourhood: Rc<Neighbourhood>,
+
+    /// The ID of the neighbourhood
+    pub neighbourhood_id: String,
 
     /// The distance of the agent's commute (categorical).  
     /// This may become deprecated, once commute_length_continuous
@@ -69,17 +78,19 @@ pub struct Agent {
     pub owns_car: bool,
 
     /// The friends of the agent
+    #[serde(skip)]
     pub social_network: Vec<Rc<RefCell<Agent>>>,
 
     /// Neighbours of the agent
+    #[serde(skip)]
     pub neighbours: Vec<Rc<RefCell<Agent>>>
 }
 
 impl Agent {
     /// Calculate the mode budget for the agent  
     /// Will also update the norm
-    /// * Returns: the mode budget, a map from TransportMode to values
-    fn calculate_mode_budget(&mut self) -> HashMap<TransportMode, f32> {
+    /// * Returns: the mode budget, a map from TransportMode to rank
+    fn calculate_mode_budget(&mut self) -> HashMap<TransportMode, u32> {
         // This is the percentage of people in the social network who take a given TransportMode,
         // Weighted by social connectivity
         let social_vals =
@@ -99,8 +110,7 @@ impl Agent {
                 |(&k, &v)| (k, v * self.subculture_connectivity)
             ).collect();
 
-        let values_to_add: Vec<&HashMap<TransportMode, f32>> =
-            vec![&social_vals, &neighbour_vals, &subculture_vals];
+        let values_to_add = vec![&social_vals, &neighbour_vals, &subculture_vals];
 
         // This sets the norm as the maximum of social_vals + neighbour_vals + subculture_vals
         self.norm = *values_to_add
@@ -119,11 +129,10 @@ impl Agent {
         ).collect();
 
         // Averages social_vals, neighbour_vals, subculture_vals, habit
-        let values_to_average: Vec<&HashMap<TransportMode, f32>> =
-            vec![&social_vals, &neighbour_vals, &subculture_vals, &habit_vals];
+        let values_to_average = vec![&social_vals, &neighbour_vals, &subculture_vals, &habit_vals];
 
         // This is the average of the values above
-        let mut average: HashMap<TransportMode, f32> = values_to_average
+        let average: HashMap<TransportMode, f32> = values_to_average
             .iter()
             .fold(HashMap::new(), |acc, x|
                 union_of(&acc, x, |v1, v2| v1 + v2)
@@ -132,34 +141,41 @@ impl Agent {
             .map(|(k, v)| (k, v / (values_to_average.len() as f32)))
             .collect();
 
-        // Take car / bike ownership into account
+        // Take car / bike ownership & congestion into account
         let ownership_modifier = hashmap! {
             TransportMode::Car => if self.owns_car {1.0f32} else {0.0f32},
             TransportMode::Cycle => if self.owns_bike {1.0f32} else {0.0f32},
         };
 
-        average = union_of(&average, &ownership_modifier, |v1, v2| v1 * v2);
+        let congestion = &self.neighbourhood.congestion_modifier.borrow();
 
-        // Find the key-value-pair in average with the highest value, and store the value
-        let max: f32 = *average
+        let values_to_multiply = vec![&average, &ownership_modifier, congestion];
+
+
+        let intermediate_budget: HashMap<TransportMode, f32> = values_to_multiply
             .iter()
-            .max_by(|v1, v2| v1.1.partial_cmp(&v2.1).unwrap_or(cmp::Ordering::Equal))
-            .unwrap()
-            .1;
+            .fold(HashMap::new(), |acc, x|
+                union_of(&acc, x, |v1, v2| v1 * v2)
+            );
 
-        // Make it so the the max mode has a budget of 1, therefore at least one mode is always possible
-        // Return the result
-        average
+        // Order the budget in reverse, then create a ranking
+
+        let budget_ordered_reverse: Vec<(TransportMode, f32)> = intermediate_budget
             .into_iter()
-            .map(|(k, v)| (k, v / max))
+            .sorted_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(Ordering::Equal));
+
+        budget_ordered_reverse
+            .into_iter()
+            .enumerate()
+            .map(|(i, (mode, _))| (mode, i as u32))
             .collect()
     }
 
     /// Calculate the cost of travel
     /// * weather: The current weather
     /// * change_in_weather: true if there has been a change in the weather, false otherwise
-    /// * Returns: A Map from transport mode to its cost
-    fn calculate_cost(&self, weather: &Weather, change_in_weather: bool) -> HashMap<TransportMode, f32> {
+    /// * Returns: A Map from transport mode to its cost ranking
+    fn calculate_cost(&self, weather: &Weather, change_in_weather: bool) -> HashMap<TransportMode, u32> {
         // Take the supportiveness for each mode, away from 1, so a lower supportiveness = higher cost
         let neighbourhood_vals: HashMap<TransportMode, f32> = self.neighbourhood
             .supportiveness
@@ -172,16 +188,7 @@ impl Agent {
         let commute_cost = self.commute_length.cost();
 
         // Average commute_cost and neighbourhood_vals
-        let values_to_average =
-            vec!(&commute_cost, &neighbourhood_vals);
-
-        let mut average: HashMap<TransportMode, f32> = values_to_average
-            .iter()
-            .fold(HashMap::new(), |acc, x| union_of(&acc, x, |v1, v2| v1 + v2))
-            .iter()
-            .map(|(&k, v)| (k, v / (values_to_average.len()) as f32))
-            .collect();
-
+        let mut average = intersection_of(&commute_cost, &neighbourhood_vals, |v1, v2| (v1 + v2) / 2.0);
         // If the weather is bad this has an impact on the cost
         if weather == &Weather::Bad {
             // If the weather was bad the day previous, and you took an active mode, this strengthens
@@ -198,24 +205,33 @@ impl Agent {
 
             // Calculate the weather modifier for Cycling and Walking
             let weather_modifier = hashmap!{
+                TransportMode::PublicTransport => 1.0f32,
+                TransportMode::Car => 1.0f32,
                 TransportMode::Cycle => 1.0f32 + self.weather_sensitivity + resolve,
                 TransportMode::Walk => 1.0f32 + self.weather_sensitivity + resolve
             };
 
             // Multiply the average by the weather modifier
-            let values_to_multiply = vec![average.clone(), weather_modifier];
-
-            average = values_to_multiply
-                .iter()
-                .fold(HashMap::new(), |acc, x| union_of(&acc, x, |v1, v2| v1 * v2));
+            average = intersection_of(&average.clone(), &weather_modifier, |v1, v2| v1 * v2)
         }
+
+        // Order the cost, and create a ranking
+        let cost_ordered: Vec<(TransportMode, f32)> = average
+            .into_iter()
+            .sorted_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(Ordering::Equal));
+
+        cost_ordered
+            .into_iter()
+            .enumerate()
+            .map(|(i, (mode, _))| (mode, i as u32))
+            .collect()
         
 
-        // If the cost is > 1, make the cost 1?
-        average
-            .into_iter()
-            .map(|(k, v)| (k, if v <= 1.0 {v} else {1.0}))
-            .collect()
+        // // If the cost is > 1, make the cost 1?
+        // average
+        //     .into_iter()
+        //     .map(|(k, v)| (k, if v <= 1.0 {v} else {1.0}))
+        //     .collect()
     }
 
     /// Updates the habit, should be called at the start of each day,
@@ -225,7 +241,7 @@ impl Agent {
 
         // the average_weight (technically multiplied by 1) should be added to
         // (1 - average_weight) * habit, to get the new habit
-        let last_mode_map: HashMap<TransportMode, f32> = hashmap!{
+        let last_mode_map = hashmap!{
             self.last_mode => self.average_weight
         };
         // Multiply the existing habit, by (1 - average_weight)
@@ -249,29 +265,38 @@ impl Agent {
         // Get the budget and cost
         let budget = self.calculate_mode_budget();
         let cost = self.calculate_cost(weather, change_in_weather);
-        
-        if (*budget.get(&TransportMode::Car).unwrap() != 0.0f32 && !self.owns_car) ||
-            (*budget.get(&TransportMode::Cycle).unwrap() != 0.0f32 && !self.owns_bike) {
-                println!("Bad Unexpected things have occured");
-        };
+        // Add them
+        let sum = intersection_of(&budget, &cost, |v1, v2| v1 + v2);
+        // Swap the key (transport mode) and value (sum), and group them
+        // Sum -> Vec<Keys>
+        let sum_value_to_key = sum
+            .into_iter()
+            .map(|(k, v)| (v, k))
+            .into_group_map();
 
-        // Filter out values where the budget is not greater than or equal to the cost
-        // Calculate the difference between the budget and the cost
-        // Get the maximum key-value pair (by value)
-        // Set the current_mode equal to the key
-        budget
-            .iter()
-            .filter_map(|(&k, &v)| {
-                let cost_val: f32 = *cost.get(&k).unwrap_or(&99999999.0f32);
-                if v >= cost_val {
-                    Some((k, v - cost_val))
-                } else {
-                    None
-                }
-            })
-            .max_by(|v1, v2| v1.1.partial_cmp(&v2.1).unwrap_or(cmp::Ordering::Equal))
+        // Sort them by sum
+        let sum_value_to_key_sorted = sum_value_to_key
+            .into_iter()
+            .sorted_by_key(|v| v.0);
+
+        // Get the TransportModes with the lowest sum
+        let minimum_values = &sum_value_to_key_sorted
+            .first()
             .unwrap()
-            .0;
+            .1;
+
+        self.current_mode = if minimum_values.len() == 1 {
+            *minimum_values.first().unwrap()
+        } else {
+            // Get the one with the lowest numerical budget (i.e. the highest budget)
+            *minimum_values
+                .into_iter()
+                .map(|mode| (mode, budget.get(&mode).unwrap()))
+                .sorted_by_key(|v| v.1)
+                .first()
+                .unwrap()
+                .0
+        }
     }
 }
 
