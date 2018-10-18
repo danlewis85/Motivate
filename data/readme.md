@@ -24,5 +24,19 @@ Creates an individual dataset for spatial microsimulation from Wave 6 of 'Unders
 
 3.3) WF_Spatial_Microsimulation.ipynb
 
-Takes in the processes constraints and individual data, and outputs a dataset of individuals who are constrained to appear similar to the Waltham Forest population.
+Takes in the constraints and individual data, and outputs a dataset of individuals who are constrained to appear similar to the Waltham Forest population.
+
+3.4) WF Travel Distance.ipynb
+
+Takes in the synthetic dataset created in 3.3 and generates travel distances for commuters based on Census flow data by commute mode. Having done this commuters are split into commute classes: local, city, beyond. Note that currently the demographic characteristics of agents have no effect on their commute distance, just their mode of travel.
+
+4) Neighbourhood Environment Scores
+
+Generates scores for the 20 wards in Waltham forest based on smple assumptions about their supportiveness for different modes of travel.
+
+4.1) tbd
+
+5) tbd
+
+Takes in the full synthetic dataset output in 3.4 and creates a yaml file that can be read into the Motivate ABM.
 
