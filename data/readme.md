@@ -36,7 +36,7 @@ Generates scores for the 20 wards in Waltham forest based on smple assumptions a
 
 4.1) tbd
 
-5) tbd
+5) setup_yaml.ipynb
 
-Takes in the full synthetic dataset output in 3.4 and creates a yaml file that can be read into the Motivate ABM.
+Takes in the full synthetic agents dataset output in 3.4, the neighbourhood data from 4) and creates a series of yaml files that can be read into the Motivate ABM. This includes the agent specification, model parameters, and scenario specification.
 
